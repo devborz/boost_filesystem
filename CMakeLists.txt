@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.4)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#option(BUILD_COVERAGE "Build coverage" OFF)
 
 set(
   HUNTER_CACHE_SERVERS
@@ -19,43 +18,18 @@ HunterGate(
 )
 
 project(filesys)
-string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
-string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
-string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
-#hunter_add_package(GTest)
 hunter_add_package(Boost COMPONENTS system filesystem)
 find_package(Boost CONFIG REQUIRED system filesystem)
-#find_package(GTest CONFIG REQUIRED)
 
-add_library(filesys STATIC
-  # enum your files and delete this comment
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/source.cpp
-)
-#add_executable(tests
-#  ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
-#)
+add_library(filesys INTERFACE)
 
+add_executable(main sources/main.cpp)
 
-target_include_directories(filesys
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-#target_include_directories(tests
-#  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-#)
-# TODO: change template word to project name and delete this comment
-#target_link_libraries(tests GTest::main template)
+target_include_directories(
+  filesys
+  INTERFACE $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
-#enable_testing()
-#add_test(NAME unit_tests COMMAND tests)
-
-#if(BUILD_COVERAGE)
-#  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-#  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-#  find_package(codecov)
-#  # TODO: change template word to project name and delete this comment
-#  add_coverage(template)
-#  add_coverage(tests)
-#  list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-#  coverage_evaluate()
-#endif()
+target_link_libraries(filesys INTERFACE Boost::filesystem)
+target_link_libraries(main filesys)
