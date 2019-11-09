@@ -1,4 +1,4 @@
-https://travis-ci.com/devborz/lab_04_boost_filesystem.svg?token=rrbTiACLSyD7Yjcuyygg&branch=master
+[![Build Status](https://travis-ci.com/devborz/lab_04_boost_filesystem.svg?token=rrbTiACLSyD7Yjcuyygg&branch=master)](https://travis-ci.com/devborz/lab_04_boost_filesystem)
 
 # Лабораторная работа №4
 
