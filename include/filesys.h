@@ -43,8 +43,6 @@ void printFinFile(const path &p,
     }
 }
 
-
-
 void printAccountsInfo(const path &path_to_dir,
     map<string, pair <unsigned int, string>>& accounts) {
     for (const directory_entry& obj : recursive_directory_iterator(path_to_dir)) {
