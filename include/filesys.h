@@ -8,7 +8,7 @@
 using namespace std;
 using namespace boost::filesystem;
 
-string get_latest_date(const string &date1,const string &date2) {
+string getLatestDate(const string &date1, const string &date2) {
     unsigned int d1 = stoi(date1);
     unsigned int d2 = stoi(date2);
 
@@ -18,65 +18,67 @@ string get_latest_date(const string &date1,const string &date2) {
         return date2;
 }
 
-void print_fin_file(path &p, map<string, pair <unsigned int, string>>& accounts) {
-    string name, bl, number, sep, date, type;
-    name = p.stem().string();
-    bl = name.substr(0, 8);
-    number = name.substr(8, 8);
-    sep = name[16];
-    date = name.substr(17, 8);
-    type = p.extension().string();
+void printFinFile(const path &p,
+    map<string, pair <unsigned int, string>>& accounts) {
 
-    if(bl == "balance_" && stoi(number) && sep == "_" && stoi(date)
+    string name = p.stem().string();
+    string balance = name.substr(0, 8);
+    string number = name.substr(8, 8);
+    string separator = name.substr(16, 1);
+    string date = name.substr(17, 8);
+    string type = p.extension().string();
+
+    if(balance == "balance_" && stoi(number) && separator == "_" && stoi(date)
     && type == ".txt") {
-        cout << p.remove_filename().string() + " " + p.filename().string() + '\n';
+
+        cout << p.parent_path().string() + " " + p.filename().string() + '\n';
+
         if (accounts.find(number) == accounts.end())
             accounts[number] = pair<int, string> (1, date);
         else {
             accounts[number].first++;
-            accounts[number].second = get_latest_date(date, accounts[number]
-                .second);
+            accounts[number].second =
+            getLatestDate(date, accounts[number].second);
         }
     }
 }
 
 
 
-void print_acc_info(map<string, pair <unsigned int, string>>& accounts,
-    path &path_to_dir) {
-    for (directory_entry& x : recursive_directory_iterator(path_to_dir)) {
-        if (is_regular_file(x.path())) {
-            string name, bl, number, sep, date, type;
-            name = x.path().stem().string();
-            bl = name.substr(0, 8);
-            number = name.substr(8, 8);
-            sep = name[16];
-            date = name.substr(17, 8);
-            type = x.path().extension().string();
+void printAccountsInfo(const path &path_to_dir,
+    map<string, pair <unsigned int, string>>& accounts) {
+    for (const directory_entry& obj : recursive_directory_iterator(path_to_dir)) {
+        if (is_regular_file(obj.path())) {
+            string name = obj.path().stem().string();
+            string balance = name.substr(0, 8);
+            string number = name.substr(8, 8);
+            string separator = name.substr(16, 1);
+            string date = name.substr(17, 8);
+            string type = obj.path().extension().string();
 
-            if(bl == "balance_" && stoi(number) && sep == "_" && stoi(date)
-            && type == ".txt" && date == accounts[number].second) {
-                cout << "broker:" << x.path().string().substr(0, x.path()
-                .string().length() - x.path().filename().string().length())
+            if(balance == "balance_" && stoi(number) && separator == "_" &&
+              stoi(date) && type == ".txt" && date == accounts[number].second) {
+
+                cout << "broker:" << obj.path().string().substr(0, obj.path()
+                .string().length() - obj.path().filename().string().length())
                 << " account:" + number + " files:" << accounts[number].first <<
                 " lastdate:" + date + '\n';
             }
         }
     }
-
 }
 
-void analyse(path p, map<string ,pair <unsigned int, string>>& accounts) {
+void analyse(const path& p,
+     map<string ,pair <unsigned int, string>>& accounts) {
     try {
-        met1:
         if (exists(p)) {
             if (is_regular_file(p))
-                print_fin_file(p, accounts);
+                printFinFile(p, accounts);
             else if (is_directory(p))
                 cout << p << " is a directory containing:\n";
             else if (is_symlink(p)) {
-                p = read_symlink(p);
-                goto met1;
+                path symlinkPath = read_symlink(p);
+                analyse(symlinkPath, accounts);
             }
             else
                 cout << p << "exists, but is not a regular file or directory\n";
@@ -89,11 +91,10 @@ void analyse(path p, map<string ,pair <unsigned int, string>>& accounts) {
     }
 }
 
-
-void iterate(path &path_to_dir) {
+void iterate(const path &pathToDir) {
     map<string ,pair <unsigned int, string>> accounts;
-    for (directory_entry& x : recursive_directory_iterator(path_to_dir)) {
-        analyse(x.path(), accounts);
+    for (const directory_entry& obj : recursive_directory_iterator(pathToDir)) {
+        analyse(obj.path(), accounts);
     }
-    print_acc_info(accounts, path_to_dir);
+    printAccountsInfo(pathToDir, accounts);
 }
