@@ -22,14 +22,24 @@ project(filesys)
 hunter_add_package(Boost COMPONENTS system filesystem)
 find_package(Boost CONFIG REQUIRED system filesystem)
 
-add_library(filesys INTERFACE)
+add_library(filesys STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/filesys.cpp)
+
+add_library(AccountsInfo STATIC
+  ${CMAKE_CURRENT_SOURCE_DIR}/sources/AccountsInfo.cpp)
+
 
 add_executable(main sources/main.cpp)
 
-target_include_directories(
-  filesys
-  INTERFACE $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_include_directories(AccountsInfo PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 
-target_link_libraries(filesys INTERFACE Boost::filesystem)
+target_include_directories(filesys PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+target_link_libraries(filesys Boost::filesystem AccountsInfo)
 target_link_libraries(main filesys)
