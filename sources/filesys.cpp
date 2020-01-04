@@ -1,6 +1,6 @@
 #include "filesys.h"
 
-std::string calcLatestDate(const std::string& date1, const std::string& date2) {
+std::string calcLatestDate(const std::string &date1, const std::string &date2) {
   unsigned int d1 = std::stoi(date1);
   unsigned int d2 = std::stoi(date2);
 
@@ -10,8 +10,8 @@ std::string calcLatestDate(const std::string& date1, const std::string& date2) {
     return date2;
 }
 
-void printFinFile(const fs::path& p,
-                  std::map<std::string, AccountsInfo>& accounts) {
+void printFinFile(const fs::path &p,
+                  std::map<std::string, AccountsInfo> &accounts) {
 
   std::string name = p.stem().string();
 
@@ -25,24 +25,26 @@ void printFinFile(const fs::path& p,
     if (balance == "balance_" && std::stoi(number) && separator == "_" &&
         std::stoi(date) && type == ".txt") {
 
-      std::cout << p.parent_path().string() + " " + p.filename().string() + '\n';
+      std::cout << p.parent_path().string() + " " + p.filename().string() +
+                       '\n';
 
       if (accounts.find(number) == accounts.end()) {
         AccountsInfo acc(date);
         accounts[number] = acc;
-      }
-      else {
+      } else {
         ++accounts[number];
-        std::string latest_date = calcLatestDate(date, accounts[number].getLatestDate());
+        std::string latest_date =
+            calcLatestDate(date, accounts[number].getLatestDate());
         accounts[number].setLatestDate(latest_date);
       }
     }
   }
 }
 
-void printAccountsInfo(const fs::path& path_to_dir,
-                       std::map<std::string, AccountsInfo>& accounts) {
-  for (const fs::directory_entry &obj : fs::recursive_directory_iterator(path_to_dir)) {
+void printAccountsInfo(const fs::path &path_to_dir,
+                       std::map<std::string, AccountsInfo> &accounts) {
+  for (const fs::directory_entry &obj :
+       fs::recursive_directory_iterator(path_to_dir)) {
     if (fs::is_regular_file(obj.path())) {
       std::string name = obj.path().stem().string();
       if (name.length() == 25) {
@@ -57,11 +59,12 @@ void printAccountsInfo(const fs::path& path_to_dir,
             date == accounts[number].getLatestDate()) {
 
           std::cout << "broker:"
-               << obj.path().string().substr(
-                      0, obj.path().string().length() -
-                             obj.path().filename().string().length())
-               << " account:" + number + " files:" << accounts[number].getCount()
-               << " lastdate:" + date + '\n';
+                    << obj.path().string().substr(
+                           0, obj.path().string().length() -
+                                  obj.path().filename().string().length())
+                    << " account:" + number + " files:"
+                    << accounts[number].getCount()
+                    << " lastdate:" + date + '\n';
         }
       }
     }
@@ -89,7 +92,8 @@ void analyse(const fs::path &p, std::map<std::string, AccountsInfo> &accounts) {
 
 void iterate(const fs::path &pathToDir) {
   std::map<std::string, AccountsInfo> accounts;
-  for (const fs::directory_entry &obj : fs::recursive_directory_iterator(pathToDir)) {
+  for (const fs::directory_entry &obj :
+       fs::recursive_directory_iterator(pathToDir)) {
     analyse(obj.path(), accounts);
   }
   printAccountsInfo(pathToDir, accounts);
