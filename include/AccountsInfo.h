@@ -3,7 +3,7 @@
 #include <string>
 
 class AccountsInfo {
-public:
+ public:
   AccountsInfo() = default;
 
   AccountsInfo(const std::string &);
@@ -20,7 +20,7 @@ public:
 
   unsigned int getCount();
 
-private:
+ private:
   std::string latest_date_;
 
   unsigned int count_of_files_ = 0;

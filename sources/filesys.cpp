@@ -12,7 +12,6 @@ std::string calcLatestDate(const std::string &date1, const std::string &date2) {
 
 void printFinFile(const fs::path &p,
                   std::map<std::string, AccountsInfo> &accounts) {
-
   std::string name = p.stem().string();
 
   if (name.length() == 25) {
@@ -24,7 +23,6 @@ void printFinFile(const fs::path &p,
 
     if (balance == "balance_" && std::stoi(number) && separator == "_" &&
         std::stoi(date) && type == ".txt") {
-
       std::cout << p.parent_path().string() + " " + p.filename().string() +
                        '\n';
 
@@ -57,7 +55,6 @@ void printAccountsInfo(const fs::path &path_to_dir,
         if (balance == "balance_" && std::stoi(number) && separator == "_" &&
             std::stoi(date) && type == ".txt" &&
             date == accounts[number].getLatestDate()) {
-
           std::cout << "broker:"
                     << obj.path().string().substr(
                            0, obj.path().string().length() -
